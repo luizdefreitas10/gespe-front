@@ -13,6 +13,10 @@ const config = {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-mono)"],
       },
+      backgroundImage: {
+        lightBg: "url('/background-black.png')",
+        darkBg: "url('/background-light.png')",
+      },
     },
   },
   darkMode: "class",
