@@ -10,31 +10,10 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
-// SCHEMA
-const schema = yup
-  .object()
-  .shape({
-    nome: yup
-      .string()
-      .required("O nome completo é obrigatório")
-      .min(3, "Nome muito curto"),
-    email: yup
-      .string()
-      .email("Formato de email inválido")
-      .required("Email é obrigatório"),
-    senha: yup
-      .string()
-      .required("A senha é obrigatória")
-      .min(6, "Mínimo de 6 caracteres"),
-    matricula: yup.string().required("A matrícula é obrigatória."),
-    nascimento: yup.string().required("Data de nascimento é obrigatória"),
-    cargo: yup.string().required("Cargo é obrigatório"),
-    departamento: yup.string().required("Departamento é obrigatório"),
-  })
-  .noUnknown(true);
-
-type FormValues = yup.InferType<typeof schema>;
+import { get } from "@/services/methods/get";
+import { FormValues, registerFormSchema } from "@/schemas/user";
+import { registerUser } from "@/app/register/actions";
+import { Bounce, toast } from "react-toastify";
 
 export default function RegisterForm() {
   const { theme } = useTheme();
@@ -43,6 +22,27 @@ export default function RegisterForm() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleRegisterUser = async (
+    name: string,
+    email: string,
+    password: string,
+    birthDate: string,
+    position: string,
+    department: string,
+    registry: string
+  ) => {
+    const response = await registerUser(
+      name,
+      email,
+      password,
+      birthDate,
+      position,
+      department,
+      registry
+    );
+    return response;
+  };
 
   const logoSrc = mounted
     ? theme === "dark"
@@ -58,7 +58,7 @@ export default function RegisterForm() {
     formState: { errors, isSubmitting },
     reset,
   } = useForm<FormValues>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(registerFormSchema),
     mode: "onSubmit",
     shouldFocusError: false,
     defaultValues: {
@@ -72,10 +72,44 @@ export default function RegisterForm() {
     },
   });
 
-  const onSubmitForm = (data: FormValues, event?: React.BaseSyntheticEvent) => {
+  const onSubmitForm = async (
+    data: FormValues,
+    event?: React.BaseSyntheticEvent
+  ) => {
     // event?.preventDefault();
-    console.log("Dados enviados:", data);
-    reset();
+    try {
+      console.log(data);
+      const response = await handleRegisterUser(
+        data.nome,
+        data.email,
+        data.senha,
+        data.nascimento,
+        data.cargo,
+        data.departamento,
+        data.matricula
+      );
+      console.log(response.isError);
+
+      if (response.isError === false) {
+        console.log("Dados enviados:", data);
+        reset();
+        toast.success("Usuário registrado com sucesso.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: theme === "light" ? "light" : "dark",
+          transition: Bounce,
+        });
+      } else {
+        toast.error(`Erro ao registrar o usuário. ${response.error}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

@@ -1,13 +1,14 @@
-import "@/styles/globals.css";
+import "../styles/globals.css";
 import { Metadata, Viewport } from "next";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans, fontInter } from "@/config/fonts";
+import { fontInter } from "@/config/fonts";
 import { Navbar } from "@/components/Navbar/navbar";
 import BackgroundImage from "@/components/BackgroundImage/backgroundImage";
+import ToastProvider from "@/components/ToastContainer";
 
 export const metadata: Metadata = {
   title: {
@@ -47,6 +48,7 @@ export default function RootLayout({
             <Navbar />
             <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow flex items-center justify-center">
               {children}
+              <ToastProvider />
             </main>
           </div>
         </Providers>
