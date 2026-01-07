@@ -30,6 +30,8 @@ export default function LoginForm() {
       : "/arpe-logo-form-light.png"
     : "/arpe-form-logo.png";
 
+  const newColoredArpeLogo = "/arpe-colored-logo.png";
+
   const {
     register,
     handleSubmit,
@@ -46,8 +48,7 @@ export default function LoginForm() {
 
   const handleLogin = async (data: ILogin) => {
     const { access_token, error } = await authenticateUser(data);
-    // console.log(isError);
-    // console.log(access_token);
+
     if (error) {
       console.log(error);
       toast.error(error);
@@ -58,7 +59,6 @@ export default function LoginForm() {
   };
 
   const submitLogin = async (data: ILogin) => {
-    // console.log("Form de login enviado" + "" + data.email + "" + data.password);
     await handleLogin(data);
   };
 
@@ -68,7 +68,7 @@ export default function LoginForm() {
       onSubmit={handleSubmit(submitLogin)}
     >
       <Image
-        src={logoSrc}
+        src={newColoredArpeLogo}
         alt="arpe logo form"
         width={80}
         height={80}

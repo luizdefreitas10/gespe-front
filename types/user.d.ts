@@ -20,3 +20,39 @@ declare interface IGetUsers {
   fullName: string;
   email: string;
 }
+
+declare interface IGetUserById {
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    birthDate: Date;
+    registry: string;
+    position: string;
+    department: string;
+    role: RoleEnum;
+    totalVacationDays: number;
+    totalTreDays: number;
+    vacation: any[];
+    tre: any[];
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+declare interface IUser {
+  id: string;
+  email: string;
+  fullName: string;
+  birthDate: Date;
+  registry: string;
+  position: string;
+  department: string;
+  role: RoleEnum;
+  totalVacationDays: number;
+  totalTreDays: number;
+  vacation: any[];
+  tre: any[];
+  createdAt: Date;
+  updatedAt: Date;
+}

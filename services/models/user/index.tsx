@@ -43,8 +43,23 @@ export default async function UserService() {
     return response;
   }
 
+  async function fetchUserById(
+    id: string,
+    token: string
+  ): Promise<IUser> {
+    console.log(id);
+    console.log(token);
+    const response = await get<IGetUserById>(`/accounts/id/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.user;
+  }
+
   return {
     createAccount,
     fetchUsers,
+    fetchUserById,
   };
 }

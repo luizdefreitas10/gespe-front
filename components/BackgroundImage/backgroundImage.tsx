@@ -26,6 +26,8 @@ export default function BackgroundImage() {
       width={1000}
       height={1000}
       quality={100}
+      priority
+      sizes="100vw"
       className="absolute left-1/2 top-1/2 -translate-x-1/2 w-full"
     />
   );

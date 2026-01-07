@@ -5,15 +5,30 @@ import {
   NavbarContent,
   NavbarItem,
 } from "@heroui/navbar";
+import { Spinner } from "@heroui/spinner";
 
 import { ThemeSwitch } from "@/components/theme-switch";
 import Image from "next/image";
 import arpeLogo from "../../public/arpe-light-logo.svg";
-import { useTheme } from "next-themes";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { Button, ButtonGroup } from "@heroui/button";
+import { useEffect, useState } from "react";
 
 export const Navbar = () => {
-  const { theme } = useTheme();
-  // console.log(theme);
+  const { handleSignOut, loggedUser, isAuthenticated } = useAuthContext();
+  const [mounted, setMounted] = useState(false);
+
+  // console.log("loggedUser", loggedUser);
+  // console.log("isAuthenticated", isAuthenticated);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <HeroUINavbar
       isBordered={false}
@@ -30,13 +45,28 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden sm:flex gap-2">
+        <NavbarItem className="hidden sm:flex gap-4">
           <ThemeSwitch />
+          {isAuthenticated && loggedUser ? (
+            <Button onPress={handleSignOut} className="bg-[#E6021D] text-white font-bold text-[12px]">SAIR</Button>
+          ) : (
+            <div className="flex gap-4">
+              <Button className="dark:bg-white dark:text-[#1E1E1E] border-black border-1 bg-white text-black font-bold text-[12px]">
+                REGISTRAR-SE
+              </Button>
+              <Button className="dark:bg-[#0C2856] dark:text-white text-white border-black border-1 font-bold bg-[#0C2856] text-[12px]">
+                ENTRAR
+              </Button>
+            </div>
+          )}
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
+        {isAuthenticated && loggedUser && (
+          <Button onPress={handleSignOut}>SAIR</Button>
+        )}
       </NavbarContent>
     </HeroUINavbar>
   );

@@ -1,4 +1,5 @@
 "use client";
+
 import { destroyCookie, parseCookies, setCookie } from "nookies";
 import React, {
   createContext,
@@ -15,7 +16,8 @@ type AuthContextType = {
   handleSignOut: () => void;
   isAuthenticated?: boolean;
   setIsAuthenticaded: React.Dispatch<React.SetStateAction<boolean>>;
-  loggedUser?: { id: string; role: string };
+  loggedUser?: { id: string; role: string, token: string } | undefined;
+  isLoading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,26 +27,51 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   //   const { push, replace } = useRouter();
   const [loggedUser, setLoggedUser] = useState<
-    { id: string; role: string } | undefined
+    { id: string; role: string, token: string } | undefined
   >();
-
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticaded] = useState(false);
-  const { "sina:x-token": sessionKey } = parseCookies();
-  const decoded = decodeToken(sessionKey);
 
-  useEffect(() => {
+  const checkAuthStatus = () => {
+    setIsLoading(true);
+    const { "gespe:x-token": sessionKey } = parseCookies();
+    
     if (sessionKey) {
-      setIsAuthenticaded(true);
-      if (decoded?.sub && decoded.role)
+      const decoded = decodeToken(sessionKey);
+      
+      if (decoded?.sub && decoded.role) {
+        setIsAuthenticaded(true);
         setLoggedUser({
-          id: decoded?.sub,
+          id: decoded.sub,
           role: decoded.role,
+          token: sessionKey,
         });
+      } else {
+        setIsAuthenticaded(false);
+        setLoggedUser(undefined);
+      }
     } else {
       setIsAuthenticaded(false);
+      setLoggedUser(undefined);
     }
-  }, [sessionKey]);
-  console.log(loggedUser);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    // Verifica o status de autenticação na montagem
+    checkAuthStatus();
+
+    // Verifica quando a página recebe foco (útil se login foi feito em outra aba)
+    const handleFocus = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
 
   function handleAuthWithToken(acessToken: string) {
     console.log("handleauthToken executado");
@@ -56,6 +83,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     console.log(decode?.role);
     console.log(decode?.sub);
+
+    // Atualiza o estado imediatamente antes de redirecionar
+    if (decode?.sub && decode.role) {
+      setIsAuthenticaded(true);
+      setLoggedUser({
+        id: decode.sub,
+        role: decode.role,
+        token: acessToken,
+      });
+    }
 
     if (decode?.role) {
       if (
@@ -81,6 +118,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     isAuthenticated,
     setIsAuthenticaded,
     loggedUser,
+    isLoading,
   };
 
   return (
