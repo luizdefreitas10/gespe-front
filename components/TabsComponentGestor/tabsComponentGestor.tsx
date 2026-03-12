@@ -11,9 +11,13 @@ import VacationHistory from "../VacationHistory/vacationHistory";
 import TreBalanceCard from "../TreBalanceCard/treBalanceCard";
 import ProgramedTreDaysCard from "../ProgramedTreDaysCard/programedTreDaysCard";
 import TreHistory from "../TreHistory/treHistory";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-export default function TabsComponent() {
+export default function TabsComponentGestor() {
   const { loggedUser } = useAuthContext();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const currentYear = useMemo(() => new Date().getFullYear(), []);
   
@@ -37,6 +41,19 @@ export default function TabsComponent() {
     () => Array.from({ length: 9 }, (_, i) => currentYear - i).map(String),
     [currentYear]
   );
+
+  // Determina a tab ativa baseada na rota e query params
+  const selectedKey = useMemo(() => {
+    if (pathname === "/gestor/management") {
+      return "gestao";
+    }
+    // Se estiver em /gestor, verifica se há query param 'tab'
+    const tab = searchParams?.get("tab");
+    if (tab === "tre") {
+      return "tre";
+    }
+    return "ferias"; // Default para férias
+  }, [pathname, searchParams]);
 
   const fetchVacationBalance = useCallback(
     async (year?: string | null) => {
@@ -99,10 +116,25 @@ export default function TabsComponent() {
     }
   }, [loggedUser?.id, selectedYear, selectedTreYear, fetchVacationBalance, fetchTreBalance]);
 
+  const handleSelectionChange = (key: React.Key) => {
+    if (key === "gestao") {
+      router.push("/gestor/management");
+    } else if (key === "ferias") {
+      router.push("/gestor");
+    } else if (key === "tre") {
+      router.push("/gestor?tab=tre");
+    }
+  };
+
+  // Se estiver na rota management, não renderizar o conteúdo das tabs
+  const isManagementPage = pathname === "/gestor/management";
+
   return (
     <div className="flex w-full flex-col mt-10">
       <Tabs
         aria-label="Options"
+        selectedKey={selectedKey}
+        onSelectionChange={handleSelectionChange}
         className="w-full items-center justify-center mb-5"
         classNames={{
           cursor: "rounded-full dark:bg-white",
@@ -117,37 +149,50 @@ export default function TabsComponent() {
           title="Férias"
           className="flex-col items-center justify-center w-[80%] mx-auto"
         >
-          <ProgramedVacationDaysCard
-            totalDays={balanceData?.total}
-            year={balanceData?.year ?? selectedYear}
-          />
-          <BalanceCard
-            selectedYear={selectedYear}
-            years={years}
-            loading={loading}
-            balanceData={balanceData}
-            onYearChange={setSelectedYear}
-          />
-          <VacationHistory />
+          {!isManagementPage && (
+            <>
+              <ProgramedVacationDaysCard
+                totalDays={balanceData?.total}
+                year={balanceData?.year ?? selectedYear}
+              />
+              <BalanceCard
+                selectedYear={selectedYear}
+                years={years}
+                loading={loading}
+                balanceData={balanceData}
+                onYearChange={setSelectedYear}
+              />
+              <VacationHistory />
+            </>
+          )}
         </Tab>
         <Tab
           key="tre"
           title="TRE"
           className="flex-col items-center justify-center w-[80%] mx-auto"
         >
-          <ProgramedTreDaysCard
-            totalDays={treBalanceData?.total}
-            year={treBalanceData?.year ?? selectedTreYear}
-          />
-          <TreBalanceCard
-            selectedYear={selectedTreYear}
-            years={years}
-            loading={treLoading}
-            balanceData={treBalanceData}
-            onYearChange={setSelectedTreYear}
-          />
-          <TreHistory />
+          {!isManagementPage && (
+            <>
+              <ProgramedTreDaysCard
+                totalDays={treBalanceData?.total}
+                year={treBalanceData?.year ?? selectedTreYear}
+              />
+              <TreBalanceCard
+                selectedYear={selectedTreYear}
+                years={years}
+                loading={treLoading}
+                balanceData={treBalanceData}
+                onYearChange={setSelectedTreYear}
+              />
+              <TreHistory />
+            </>
+          )}
         </Tab>
+        <Tab
+          key="gestao"
+          title="Gestão"
+          className="flex-col items-center justify-center w-[80%] mx-auto"
+        />
       </Tabs>
     </div>
   );
