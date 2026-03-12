@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import "../../styles/globals.css";
+import "../../../styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Gespe - Férias e TRE",
-  description: "Gespe - Férias e TRE",
+  title: "Gespe - Gestão de Usuários",
+  description: "Gespe - Gestão de Usuários",
 };
 
-export default function GestorLayout({
+export default function ManagementLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

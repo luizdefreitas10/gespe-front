@@ -5,68 +5,14 @@ import { Select, SelectItem } from "@heroui/select";
 import { Progress } from "@heroui/progress";
 import { Spinner } from "@heroui/spinner";
 import { CalendarIcon } from "../CalendarIcon/calendarIcon";
-import { useAuthContext } from "@/contexts/AuthContext";
-import { get } from "@/services/methods/get";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 
 interface TreBalanceCardProps {
-  selectedYear: string;
+  selectedYear: string | null;
   years: string[];
   loading: boolean;
   balanceData: ITreBalanceResponse | null;
   onYearChange: (year: string) => void;
-}
-
-interface TresResponse {
-  tres: ITre[];
-}
-
-function calculateTotalIncludedDays(tres: ITre[]): number {
-  return tres.reduce((total, tre) => {
-    // Soma apenas inclusões de saldo e cancelamentos de gozo
-    if (tre.requestType === "INCLUIR_SALDO") {
-      return total + tre.amoutOfTreDays;
-    }
-    if (tre.requestType === "CANCELAMENTO_DE_GOZO") {
-      return total + tre.amoutOfTreDays;
-    }
-    return total;
-  }, 0);
-}
-
-function calculateUsedDays(tres: ITre[]): number {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-
-  return tres.reduce((total, tre) => {
-    if (
-      tre.requestType === "SOLICITACAO_DE_GOZO" &&
-      tre.firstTreDay &&
-      tre.lastTreDay
-    ) {
-      const firstDay = new Date(tre.firstTreDay);
-      firstDay.setHours(0, 0, 0, 0);
-      const lastDay = new Date(tre.lastTreDay);
-      lastDay.setHours(0, 0, 0, 0);
-
-      // Se a data atual está antes do primeiro dia, não foi usado nada
-      if (now < firstDay) {
-        return total;
-      }
-
-      // Se a data atual já passou do último dia, todos os dias foram usados
-      if (now > lastDay) {
-        return total + tre.amoutOfTreDays;
-      }
-
-      // Se está dentro do range, calcula quantos dias já passaram
-      const diffTime = now.getTime() - firstDay.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir o dia atual
-      return total + Math.min(diffDays, tre.amoutOfTreDays);
-    }
-
-    return total;
-  }, 0);
 }
 
 export default function TreBalanceCard({
@@ -76,49 +22,23 @@ export default function TreBalanceCard({
   balanceData,
   onYearChange,
 }: TreBalanceCardProps) {
-  const { loggedUser } = useAuthContext();
-  const [tres, setTres] = useState<ITre[]>([]);
-  const [tresLoading, setTresLoading] = useState(true);
+  const hasSelectedYear = Boolean(selectedYear);
 
-  const fetchTres = useCallback(async () => {
-    if (!loggedUser?.id) return;
+  const totalDays = balanceData?.total || 0;
+  const usedDays = balanceData?.used || 0;
+  const availableDays = balanceData?.available || 0;
+  const recordsCount = balanceData?.recordsCount || 0;
+  const overallAvailableDays = balanceData?.overallBalance?.available || 0;
+  const hasYearFilter = balanceData?.year !== null && balanceData?.year !== undefined;
 
-    try {
-      setTresLoading(true);
-      const data = await get<TresResponse>(`/tre/by-user-id?page=1`);
-      const items = data?.tres ?? [];
-
-      // Filtrar por ano se especificado
-      const filteredItems = selectedYear
-        ? items.filter((tre) => tre.yearOfAcquisition === Number(selectedYear))
-        : items;
-
-      setTres(filteredItems);
-    } catch (error) {
-      console.error("Erro ao buscar TREs para cálculo:", error);
-    } finally {
-      setTresLoading(false);
-    }
-  }, [loggedUser?.id, selectedYear]);
-
-  useEffect(() => {
-    if (loggedUser?.id) {
-      fetchTres();
-    }
-  }, [loggedUser?.id, selectedYear, fetchTres]);
-
-  // Calcula os valores baseado nos registros de TRE
-  const calculatedTotalDays = useMemo(() => calculateTotalIncludedDays(tres), [tres]);
-  const calculatedUsedDays = useMemo(() => calculateUsedDays(tres), [tres]);
-  const calculatedAvailableDays = Math.max(0, calculatedTotalDays - calculatedUsedDays);
-
-  // Usa os valores calculados quando há registros, senão usa os valores da API como fallback
-  const totalDays = tres.length > 0 ? calculatedTotalDays : (balanceData?.total || 0);
-  const usedDays = tres.length > 0 ? calculatedUsedDays : (balanceData?.used || 0);
-  const availableDays = tres.length > 0 ? calculatedAvailableDays : (balanceData?.available || 0);
-  
   const progressPercentage = totalDays > 0 ? (usedDays / totalDays) * 100 : 0;
-  const isLoading = loading || tresLoading;
+  const isLoading = loading;
+
+  const yearLabel = useMemo(() => {
+    if (!hasSelectedYear) return "Disponíveis (todos os anos)";
+    if (balanceData?.year) return `Disponíveis para ${balanceData.year}`;
+    return `Disponíveis para ${selectedYear}`;
+  }, [balanceData?.year, hasSelectedYear, selectedYear]);
 
   const handleYearChange = (keys: any) => {
     const selected = Array.from(keys)[0] as string;
@@ -135,10 +55,10 @@ export default function TreBalanceCard({
             </div>
             <div className="flex flex-col">
               <h1 className="font-bold text-black dark:text-white text-3xl">
-                Saldo total TRE
+                Saldo de TRE
               </h1>
               <h2 className="text-[#575757] dark:text-[#999999] text-[15px]">
-                Visualize seu saldo total de TRE por ano
+                Acompanhe saldo por ano e consolidado
               </h2>
             </div>
           </div>
@@ -146,11 +66,13 @@ export default function TreBalanceCard({
             <Select
               label="Selecione o ano"
               className="w-max-w-xs"
-              selectedKeys={[selectedYear]}
+              selectedKeys={selectedYear ? [selectedYear] : []}
               onSelectionChange={handleYearChange}
             >
               {years.map((year) => (
-                <SelectItem key={year}>{year}</SelectItem>
+                <SelectItem key={year}>
+                  {year}
+                </SelectItem>
               ))}
             </Select>
           </div>
@@ -171,10 +93,13 @@ export default function TreBalanceCard({
                 </span>
               </div>
               <p className="text-sm text-gray-600 mt-2 dark:text-[#999999]">
-                {selectedYear
-                  ? `Disponíveis para ${selectedYear}`
-                  : "Disponíveis (todos os anos)"}
+                {yearLabel}
               </p>
+              {hasSelectedYear && (
+                <p className="text-xs text-gray-500 mt-1 dark:text-[#a3a3a3]">
+                  Disponiveis no total (todos os anos): {overallAvailableDays} dias
+                </p>
+              )}
             </div>
             <Progress
               aria-label="Progresso de TRE"
@@ -188,15 +113,31 @@ export default function TreBalanceCard({
               <div className="flex items-center gap-2">
                 <div className="w-[15px] h-[15px] bg-[#40E001] rounded-full"></div>
                 <h1 className="dark:text-[#999999]">
-                  Utilizados: {usedDays} dias
+                  {hasYearFilter
+                    ? `Utilizados no ano: ${usedDays} dias`
+                    : `Utilizados no periodo: ${usedDays} dias`}
                 </h1>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-[15px] h-[15px] bg-[#B3B2B2] rounded-full"></div>
                 <h1 className="dark:text-[#999999]">
-                  Disponíveis: {availableDays} dias
+                  {hasYearFilter
+                    ? `Disponiveis no ano: ${availableDays} dias`
+                    : `Disponiveis no periodo: ${availableDays} dias`}
                 </h1>
               </div>
+            </div>
+            <div className="mt-3 w-full flex justify-between text-sm text-gray-600 dark:text-[#a3a3a3]">
+              <span>
+                {hasYearFilter
+                  ? `Registros no ano: ${recordsCount}`
+                  : `Registros no periodo: ${recordsCount}`}
+              </span>
+              <span>
+                {hasYearFilter
+                  ? `Saldo do ano: ${totalDays} dias`
+                  : `Saldo do periodo: ${totalDays} dias`}
+              </span>
             </div>
           </>
         )}

@@ -24,7 +24,10 @@ export default function BalanceCard({
   const availableDays = balanceData?.available || 0;
   const usedDays = balanceData?.used || 0;
   const totalDays = balanceData?.total || 0;
+  const yearRecordsCount = balanceData?.recordsCount || 0;
+  const overallAvailableDays = balanceData?.overallBalance?.available || 0;
   const progressPercentage = totalDays > 0 ? (usedDays / totalDays) * 100 : 0;
+  const hasYearFilter = balanceData?.year !== null && balanceData?.year !== undefined;
 
   const handleYearChange = (keys: any) => {
     const selected = Array.from(keys)[0] as string;
@@ -41,10 +44,10 @@ export default function BalanceCard({
             </div>
             <div className="flex flex-col">
               <h1 className="font-bold text-black dark:text-white text-3xl">
-                Saldo total
+                Saldo de férias
               </h1>
               <h2 className="text-[#575757] dark:text-[#999999] text-[15px]">
-                Visualize seu saldo total por ano
+                Acompanhe saldo por ano e consolidado
               </h2>
             </div>
           </div>
@@ -81,6 +84,9 @@ export default function BalanceCard({
                   ? `Disponíveis para ${balanceData.year}`
                   : "Disponíveis (todos os anos)"}
               </p>
+              <p className="text-xs text-gray-500 mt-1 dark:text-[#a3a3a3]">
+                Saldo total disponivel (todos os anos): {overallAvailableDays} dias
+              </p>
             </div>
             <Progress
               aria-label="Progresso de férias"
@@ -94,15 +100,31 @@ export default function BalanceCard({
               <div className="flex items-center gap-2">
                 <div className="w-[15px] h-[15px] bg-[#40E001] rounded-full"></div>
                 <h1 className="dark:text-[#999999]">
-                  Utilizados: {usedDays} dias
+                  {hasYearFilter
+                    ? `Utilizados no ano: ${usedDays} dias`
+                    : `Utilizados no periodo: ${usedDays} dias`}
                 </h1>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-[15px] h-[15px] bg-[#B3B2B2] rounded-full"></div>
                 <h1 className="dark:text-[#999999]">
-                  Disponíveis: {availableDays} dias
+                  {hasYearFilter
+                    ? `Disponiveis no ano: ${availableDays} dias`
+                    : `Disponiveis no periodo: ${availableDays} dias`}
                 </h1>
               </div>
+            </div>
+            <div className="mt-3 w-full flex justify-between text-sm text-gray-600 dark:text-[#a3a3a3]">
+              <span>
+                {hasYearFilter
+                  ? `Registros no ano: ${yearRecordsCount}`
+                  : `Registros no periodo: ${yearRecordsCount}`}
+              </span>
+              <span>
+                {hasYearFilter
+                  ? `Saldo do ano: ${totalDays} dias`
+                  : `Saldo do periodo: ${totalDays} dias`}
+              </span>
             </div>
           </>
         ) : null}

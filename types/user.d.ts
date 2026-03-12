@@ -19,6 +19,8 @@ declare interface IGetUsers {
   id: string;
   fullName: string;
   email: string;
+  department?: string;
+  status?: string;
 }
 
 declare interface IGetUserById {

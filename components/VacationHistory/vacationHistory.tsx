@@ -3,6 +3,13 @@
 import { useAuthContext } from "@/contexts/AuthContext";
 import { get } from "@/services/methods/get";
 import { Button } from "@heroui/button";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/modal";
 import { Spinner } from "@heroui/spinner";
 import { useCallback, useEffect, useState } from "react";
 
@@ -16,6 +23,33 @@ function formatDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR").format(parsed);
 }
 
+function getVacationRequestTypeLabel(requestType: string | null): string {
+  switch (requestType) {
+    case "PROGRAMACAO_DE_FERIAS":
+      return "Programação de férias";
+    case "SUSPENSAO_DE_GOZO":
+      return "Suspensão de gozo";
+    case "ALTERACAO_DE_GOZO":
+      return "Alteração de gozo";
+    case "SOLICITACAO_DE_GOZO":
+      return "Solicitação de gozo";
+    default:
+      return requestType || "Não informado";
+  }
+}
+
+function formatOptionalValue(value: string | number | boolean | null | undefined) {
+  if (value === null || value === undefined || value === "") {
+    return "Não informado";
+  }
+  return String(value);
+}
+
+function getEffectiveEnjoymentLabel(value: boolean | null) {
+  if (value === null || value === undefined) return "Não informado";
+  return value ? "Sim" : "Não";
+}
+
 export default function VacationHistory() {
   const { loggedUser } = useAuthContext();
   const [vacations, setVacations] = useState<IVacation[]>([]);
@@ -23,6 +57,7 @@ export default function VacationHistory() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedVacation, setSelectedVacation] = useState<IVacation | null>(null);
 
   const fetchVacations = useCallback(
     async (nextPage: number, append = false) => {
@@ -112,7 +147,16 @@ export default function VacationHistory() {
               return (
               <div
                 key={key}
-                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 rounded-2xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] px-4 py-3 shadow-sm"
+                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 rounded-2xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] px-4 py-3 shadow-sm cursor-pointer transition hover:shadow-md"
+                onClick={() => setSelectedVacation(vacation)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedVacation(vacation);
+                  }
+                }}
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-[#0C2856] dark:text-white">
@@ -150,6 +194,77 @@ export default function VacationHistory() {
           )}
         </div>
       </div>
+
+      <Modal
+        isOpen={Boolean(selectedVacation)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setSelectedVacation(null);
+        }}
+      >
+        <ModalContent className="border border-[#d9e2f0] dark:border-[#1d3b68] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] shadow-2xl rounded-2xl">
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl font-bold text-[#0C2856] dark:text-white tracking-wide border-b border-[#e6edf7] dark:border-[#1d3b68] pb-4">
+                DETALHES DA SOLICITAÇÃO
+              </ModalHeader>
+              <ModalBody className="pt-5">
+                {selectedVacation && (
+                  <div className="rounded-xl border border-[#d7e2f3] dark:border-[#244977] bg-[#f8fbff] dark:bg-[#0d203b] p-4 md:p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Tipo de solicitação:</strong>{" "}
+                        {getVacationRequestTypeLabel(selectedVacation.requestType)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Ano de aquisição:</strong>{" "}
+                        {formatOptionalValue(selectedVacation.year)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff] md:col-span-2">
+                        <strong className="text-[#0C2856] dark:text-white">Período:</strong>{" "}
+                        {formatDate(selectedVacation.firstVacationDay)} -{" "}
+                        {formatDate(selectedVacation.lastVacationDay)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Dias solicitados:</strong>{" "}
+                        {formatOptionalValue(selectedVacation.amoutOfVacationDays)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Efetivo gozo:</strong>{" "}
+                        {getEffectiveEnjoymentLabel(selectedVacation.effectiveEnjoyment)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Número SEI:</strong>{" "}
+                        {formatOptionalValue(selectedVacation.vacationSeiNumber)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff] md:col-span-2">
+                        <strong className="text-[#0C2856] dark:text-white">Observações:</strong>{" "}
+                        {formatOptionalValue(selectedVacation.observations)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Criado em:</strong>{" "}
+                        {formatDate(selectedVacation.createdAt)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Atualizado em:</strong>{" "}
+                        {formatDate(selectedVacation.updatedAt)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter className="border-t border-[#e6edf7] dark:border-[#1d3b68] pt-4">
+                <Button
+                  color="primary"
+                  className="font-semibold px-6 bg-[#0C2856] hover:bg-[#143e7a] text-white"
+                  onPress={onClose}
+                >
+                  Fechar
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

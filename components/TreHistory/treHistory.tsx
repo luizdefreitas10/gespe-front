@@ -3,6 +3,13 @@
 import { useAuthContext } from "@/contexts/AuthContext";
 import { get } from "@/services/methods/get";
 import { Button } from "@heroui/button";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/modal";
 import { Spinner } from "@heroui/spinner";
 import { useCallback, useEffect, useState } from "react";
 
@@ -11,7 +18,7 @@ interface TresResponse {
 }
 
 function formatDate(date: string | null) {
-  if (!date) return "N/A";
+  if (!date) return "Não informado";
   const parsed = new Date(date);
   if (Number.isNaN(parsed.getTime())) return date;
   return new Intl.DateTimeFormat("pt-BR").format(parsed);
@@ -26,8 +33,22 @@ function getRequestTypeLabel(requestType: string | null): string {
     case "CANCELAMENTO_DE_GOZO":
       return "Cancelamento de gozo";
     default:
-      return "TRE";
+      return requestType || "Não informado";
   }
+}
+
+function formatOptionalValue(value: string | number | null | undefined) {
+  if (value === null || value === undefined || value === "") {
+    return "Não informado";
+  }
+  return String(value);
+}
+
+function getEffectiveEnjoymentLabel(value: string | null) {
+  if (!value) return "Não informado";
+  if (value === "YES") return "Sim";
+  if (value === "NO") return "Não";
+  return value;
 }
 
 export default function TreHistory() {
@@ -37,6 +58,7 @@ export default function TreHistory() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedTre, setSelectedTre] = useState<ITre | null>(null);
 
   const fetchTres = useCallback(
     async (nextPage: number, append = false) => {
@@ -126,7 +148,16 @@ export default function TreHistory() {
               return (
               <div
                 key={key}
-                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 rounded-2xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] px-4 py-3 shadow-sm"
+                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 rounded-2xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] px-4 py-3 shadow-sm cursor-pointer transition hover:shadow-md"
+                onClick={() => setSelectedTre(tre)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedTre(tre);
+                  }
+                }}
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-[#0C2856] dark:text-white">
@@ -140,7 +171,7 @@ export default function TreHistory() {
                     </>
                   ) : (
                     <span className="text-xs text-gray-600 dark:text-gray-300">
-                      Ano de aquisição: {tre.yearOfAcquisition || "N/A"}
+                      Ano de aquisição: {tre.yearOfAcquisition || "Não informado"}
                     </span>
                   )}
                   <span className="text-xs text-gray-600 dark:text-gray-300">
@@ -172,6 +203,76 @@ export default function TreHistory() {
           )}
         </div>
       </div>
+
+      <Modal
+        isOpen={Boolean(selectedTre)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setSelectedTre(null);
+        }}
+      >
+        <ModalContent className="border border-[#d9e2f0] dark:border-[#1d3b68] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] shadow-2xl rounded-2xl">
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl font-bold text-[#0C2856] dark:text-white tracking-wide border-b border-[#e6edf7] dark:border-[#1d3b68] pb-4">
+                DETALHES DA SOLICITAÇÃO
+              </ModalHeader>
+              <ModalBody className="pt-5">
+                {selectedTre && (
+                  <div className="rounded-xl border border-[#d7e2f3] dark:border-[#244977] bg-[#f8fbff] dark:bg-[#0d203b] p-4 md:p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Tipo de solicitação:</strong>{" "}
+                        {getRequestTypeLabel(selectedTre.requestType)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Ano de aquisição:</strong>{" "}
+                        {formatOptionalValue(selectedTre.yearOfAcquisition)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff] md:col-span-2">
+                        <strong className="text-[#0C2856] dark:text-white">Período:</strong>{" "}
+                        {formatDate(selectedTre.firstTreDay)} - {formatDate(selectedTre.lastTreDay)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Dias solicitados:</strong>{" "}
+                        {formatOptionalValue(selectedTre.amoutOfTreDays)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Efetivo gozo:</strong>{" "}
+                        {getEffectiveEnjoymentLabel(selectedTre.effectiveEnjoyment)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Número SEI:</strong>{" "}
+                        {formatOptionalValue(selectedTre.treSeiNumber)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff] md:col-span-2">
+                        <strong className="text-[#0C2856] dark:text-white">Observações:</strong>{" "}
+                        {formatOptionalValue(selectedTre.observations)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Criado em:</strong>{" "}
+                        {formatDate(selectedTre.createdAt)}
+                      </p>
+                      <p className="text-[#2b3e57] dark:text-[#d7e5ff]">
+                        <strong className="text-[#0C2856] dark:text-white">Atualizado em:</strong>{" "}
+                        {formatDate(selectedTre.updatedAt)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter className="border-t border-[#e6edf7] dark:border-[#1d3b68] pt-4">
+                <Button
+                  color="primary"
+                  className="font-semibold px-6 bg-[#0C2856] hover:bg-[#143e7a] text-white"
+                  onPress={onClose}
+                >
+                  Fechar
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

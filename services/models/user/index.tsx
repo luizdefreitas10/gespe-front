@@ -35,12 +35,30 @@ export default async function UserService() {
   }
 
   async function fetchUsers(token: string): Promise<IGetUsers[]> {
-    const response = await get<IGetUsers[]>(`/accounts`, {
+    const response = await get<IGetUsers[] | { data?: IGetUsers[]; users?: IGetUsers[] }>(`/accounts`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response;
+    
+    // Garante que retorna um array
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    // Se for um objeto, tenta extrair o array
+    if (response && typeof response === 'object') {
+      if ('data' in response && Array.isArray(response.data)) {
+        return response.data;
+      }
+      if ('users' in response && Array.isArray(response.users)) {
+        return response.users;
+      }
+    }
+    
+    // Se não conseguir extrair, retorna array vazio
+    console.warn("Formato de resposta inesperado:", response);
+    return [];
   }
 
   async function fetchUserById(

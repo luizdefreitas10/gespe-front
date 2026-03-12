@@ -3,6 +3,13 @@ declare interface IVacationBalanceResponse {
     total: number;
     used: number;
     available: number;
+    recordsCount: number;
+    overallBalance: {
+        total: number;
+        used: number;
+        available: number;
+        recordsCount: number;
+    };
     year: number | null;
     message: string;
 }
