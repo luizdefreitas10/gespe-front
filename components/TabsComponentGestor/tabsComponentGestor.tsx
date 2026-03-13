@@ -44,16 +44,12 @@ export default function TabsComponentGestor() {
 
   // Determina a tab ativa baseada na rota e query params
   const selectedKey = useMemo(() => {
-    if (pathname === "/gestor/management") {
-      return "gestao";
-    }
-    // Se estiver em /gestor, verifica se há query param 'tab'
     const tab = searchParams?.get("tab");
     if (tab === "tre") {
       return "tre";
     }
-    return "ferias"; // Default para férias
-  }, [pathname, searchParams]);
+    return "ferias";
+  }, [searchParams]);
 
   const fetchVacationBalance = useCallback(
     async (year?: string | null) => {
@@ -117,9 +113,7 @@ export default function TabsComponentGestor() {
   }, [loggedUser?.id, selectedYear, selectedTreYear, fetchVacationBalance, fetchTreBalance]);
 
   const handleSelectionChange = (key: React.Key) => {
-    if (key === "gestao") {
-      router.push("/gestor/management");
-    } else if (key === "ferias") {
+    if (key === "ferias") {
       router.push("/gestor");
     } else if (key === "tre") {
       router.push("/gestor?tab=tre");
@@ -127,7 +121,7 @@ export default function TabsComponentGestor() {
   };
 
   // Se estiver na rota management, não renderizar o conteúdo das tabs
-  const isManagementPage = pathname === "/gestor/management";
+  const isManagementPage = pathname?.startsWith("/gestor/management");
 
   return (
     <div className="flex w-full flex-col mt-10">
@@ -188,11 +182,6 @@ export default function TabsComponentGestor() {
             </>
           )}
         </Tab>
-        <Tab
-          key="gestao"
-          title="Gestão"
-          className="flex-col items-center justify-center w-[80%] mx-auto"
-        />
       </Tabs>
     </div>
   );
