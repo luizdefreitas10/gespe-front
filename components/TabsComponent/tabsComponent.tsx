@@ -11,9 +11,12 @@ import VacationHistory from "../VacationHistory/vacationHistory";
 import TreBalanceCard from "../TreBalanceCard/treBalanceCard";
 import ProgramedTreDaysCard from "../ProgramedTreDaysCard/programedTreDaysCard";
 import TreHistory from "../TreHistory/treHistory";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function TabsComponent() {
   const { loggedUser } = useAuthContext();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const currentYear = useMemo(() => new Date().getFullYear(), []);
   
@@ -37,6 +40,12 @@ export default function TabsComponent() {
     () => Array.from({ length: 9 }, (_, i) => currentYear - i).map(String),
     [currentYear]
   );
+
+  const selectedKey = useMemo(() => {
+    const tab = searchParams?.get("tab");
+    if (tab === "tre") return "tre";
+    return "ferias";
+  }, [searchParams]);
 
   const fetchVacationBalance = useCallback(
     async (year?: string | null) => {
@@ -99,10 +108,20 @@ export default function TabsComponent() {
     }
   }, [loggedUser?.id, selectedYear, selectedTreYear, fetchVacationBalance, fetchTreBalance]);
 
+  const handleSelectionChange = (key: React.Key) => {
+    if (key === "tre") {
+      router.push("/user?tab=tre");
+      return;
+    }
+    router.push("/user");
+  };
+
   return (
     <div className="flex w-full flex-col mt-10">
       <Tabs
         aria-label="Options"
+        selectedKey={selectedKey}
+        onSelectionChange={handleSelectionChange}
         className="w-full items-center justify-center mb-5"
         classNames={{
           cursor: "rounded-full dark:bg-white",
