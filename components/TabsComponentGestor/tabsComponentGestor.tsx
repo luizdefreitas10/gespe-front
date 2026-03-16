@@ -141,7 +141,7 @@ export default function TabsComponentGestor() {
         <Tab
           key="ferias"
           title="Férias"
-          className="flex-col items-center justify-center w-[80%] mx-auto"
+          className="flex-col items-center justify-center w-full md:w-[80%] md:mx-auto"
         >
           {!isManagementPage && (
             <>
@@ -163,7 +163,7 @@ export default function TabsComponentGestor() {
         <Tab
           key="tre"
           title="TRE"
-          className="flex-col items-center justify-center w-[80%] mx-auto"
+          className="flex-col items-center justify-center w-full md:w-[80%] md:mx-auto"
         >
           {!isManagementPage && (
             <>

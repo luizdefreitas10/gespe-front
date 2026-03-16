@@ -12,7 +12,7 @@ export default function GestorLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex w-screen h-full overflow-hidden">
+    <div className="flex w-full max-w-full min-w-0 h-full overflow-hidden">
       {children}
     </div>
   );

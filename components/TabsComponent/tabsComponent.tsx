@@ -134,7 +134,7 @@ export default function TabsComponent() {
         <Tab
           key="ferias"
           title="Férias"
-          className="flex-col items-center justify-center w-[80%] mx-auto"
+          className="flex-col items-center justify-center w-full md:w-[80%] md:mx-auto"
         >
           <ProgramedVacationDaysCard
             totalDays={balanceData?.total}
@@ -152,7 +152,7 @@ export default function TabsComponent() {
         <Tab
           key="tre"
           title="TRE"
-          className="flex-col items-center justify-center w-[80%] mx-auto"
+          className="flex-col items-center justify-center w-full md:w-[80%] md:mx-auto"
         >
           <ProgramedTreDaysCard
             totalDays={treBalanceData?.total}

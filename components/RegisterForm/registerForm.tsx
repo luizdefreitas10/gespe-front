@@ -114,7 +114,7 @@ export default function RegisterForm() {
 
   return (
     <Form
-      className="flex flex-col gap-4 dark:bg-black/30 w-[600px] p-10 px-35 rounded-2xl backdrop-blur-md border-2 border-[#8b97ab] dark:border-[#293c61] mb-16"
+      className="flex flex-col gap-4 dark:bg-black/30 w-full max-w-[600px] md:w-[600px] mx-auto p-6 px-5 sm:p-8 sm:px-8 md:p-10 md:px-35 rounded-2xl backdrop-blur-md border-2 border-[#8b97ab] dark:border-[#293c61] mb-16"
       onSubmit={handleSubmit(onSubmitForm)}
     >
       <Image
@@ -126,78 +126,107 @@ export default function RegisterForm() {
         className="mx-auto"
       />
       <h1 className="mx-auto mt-6">Registro</h1>
-      <Input
-        className="border-b-1"
-        size="sm"
-        label="Nome Completo"
-        variant="underlined"
-        placeholder="Digite seu nome"
-        {...register("nome")}
-        isInvalid={!!errors.nome}
-        errorMessage={errors.nome?.message}
-      />
+      <div className="w-full min-w-0 flex flex-col gap-4">
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Nome Completo"
+          variant="underlined"
+          placeholder="Digite seu nome"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("nome")}
+          isInvalid={!!errors.nome}
+          errorMessage={errors.nome?.message}
+        />
 
-      <Input
-        className="border-b-1"
-        label="Email"
-        variant="underlined"
-        placeholder="Digite seu email"
-        {...register("email")}
-        isInvalid={!!errors.email}
-        errorMessage={errors.email?.message}
-      />
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Email"
+          variant="underlined"
+          placeholder="Digite seu email"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("email")}
+          isInvalid={!!errors.email}
+          errorMessage={errors.email?.message}
+        />
 
-      <Input
-        className="border-b-1"
-        label="Senha"
-        variant="underlined"
-        placeholder="Digite sua senha"
-        type="password"
-        {...register("senha")}
-        isInvalid={!!errors.senha}
-        errorMessage={errors.senha?.message}
-      />
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Senha"
+          variant="underlined"
+          placeholder="Digite sua senha"
+          type="password"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("senha")}
+          isInvalid={!!errors.senha}
+          errorMessage={errors.senha?.message}
+        />
 
-      <Input
-        className="border-b-1"
-        label="Matrícula"
-        variant="underlined"
-        placeholder="Digite seu matrícula"
-        {...register("matricula")}
-        isInvalid={!!errors.matricula}
-        errorMessage={errors.matricula?.message}
-      />
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Matrícula"
+          variant="underlined"
+          placeholder="Digite seu matrícula"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("matricula")}
+          isInvalid={!!errors.matricula}
+          errorMessage={errors.matricula?.message}
+        />
 
-      <Input
-        className="border-b-1"
-        label="Data de Nascimento"
-        variant="underlined"
-        placeholder="Digite sua data de nascimento"
-        type="date"
-        {...register("nascimento")}
-        isInvalid={!!errors.nascimento}
-        errorMessage={errors.nascimento?.message}
-      />
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Data de Nascimento"
+          variant="underlined"
+          placeholder="Digite sua data de nascimento"
+          type="date"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("nascimento")}
+          isInvalid={!!errors.nascimento}
+          errorMessage={errors.nascimento?.message}
+        />
 
-      <Input
-        className="border-b-1"
-        label="Cargo"
-        variant="underlined"
-        placeholder="Digite seu cargo"
-        {...register("cargo")}
-        isInvalid={!!errors.cargo}
-        errorMessage={errors.cargo?.message}
-      />
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Cargo"
+          variant="underlined"
+          placeholder="Digite seu cargo"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("cargo")}
+          isInvalid={!!errors.cargo}
+          errorMessage={errors.cargo?.message}
+        />
 
-      <Input
-        className="border-b-1"
-        label="Departamento"
-        variant="underlined"
-        placeholder="Digite seu departamento"
-        {...register("departamento")}
-        isInvalid={!!errors.departamento}
-        errorMessage={errors.departamento?.message}
-      />
+        <Input
+          className="w-full min-w-0 border-b-1"
+          label="Departamento"
+          variant="underlined"
+          placeholder="Digite seu departamento"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
+          {...register("departamento")}
+          isInvalid={!!errors.departamento}
+          errorMessage={errors.departamento?.message}
+        />
+      </div>
 
       <Button
         type="submit"
@@ -220,7 +249,7 @@ export default function RegisterForm() {
       <Button
         variant="bordered"
         radius="md"
-        className="w-full ext-black dark:text-white border-black dark:border-white border-1"
+        className="w-full text-black dark:text-white border-black dark:border-white border-1"
         isLoading={isSubmitting}
         onPress={() => router.push("/")}
       >

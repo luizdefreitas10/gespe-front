@@ -48,7 +48,7 @@ export default function TreBalanceCard({
   return (
     <Card className="w-full mx-auto bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border dark:border-[#102d59] dark:shadow-[0_12px_45px_rgba(0,0,0,0.5)]">
       <CardBody className="w-full h-full bg-transparent dark:bg-transparent">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex gap-4 items-center text-[#6a7bd2]">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#e8f0ff] text-[#6a7bd2] dark:bg-[#1e293b] dark:text-[#a5b4fc]">
               <CalendarIcon width={24} height={24} />
@@ -62,7 +62,7 @@ export default function TreBalanceCard({
               </h2>
             </div>
           </div>
-          <div className="w-[200px]">
+          <div className="w-full sm:w-[200px]">
             <Select
               label="Selecione o ano"
               className="w-max-w-xs"
