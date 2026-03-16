@@ -46,7 +46,7 @@ export default function RootLayout({
           <BackgroundImage />
           <div className="relative flex flex-col min-h-screen">
             <Navbar />
-            <main className="w-full mx-auto flex-grow flex flex-col items-stretch justify-center overflow-x-hidden">
+            <main className="w-full max-w-full mx-auto flex-grow flex flex-col items-stretch justify-center overflow-x-hidden px-4 sm:px-6 md:px-0">
               {children}
               <ToastProvider />
             </main>

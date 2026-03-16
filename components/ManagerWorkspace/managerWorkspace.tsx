@@ -706,7 +706,7 @@ export default function ManagerWorkspace({ variant }: ManagerWorkspaceProps) {
             if (!isOpen) setSelectedRecord(null);
           }}
         >
-          <ModalContent className="border border-[#d9e2f0] dark:border-[#1d3b68] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] shadow-2xl rounded-2xl">
+          <ModalContent className="border border-[#d9e2f0] dark:border-[#1d3b68] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] shadow-2xl rounded-2xl max-w-[calc(100vw-2rem)]">
             {(onClose) => (
               <>
                 <ModalHeader className="text-xl font-bold text-[#0C2856] dark:text-white tracking-wide border-b border-[#e6edf7] dark:border-[#1d3b68] pb-4">
@@ -758,7 +758,7 @@ export default function ManagerWorkspace({ variant }: ManagerWorkspaceProps) {
           if (!isOpen) setSelectedRecord(null);
         }}
       >
-        <ModalContent className="border border-[#d9e2f0] dark:border-[#1d3b68] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] shadow-2xl rounded-2xl">
+        <ModalContent className="border border-[#d9e2f0] dark:border-[#1d3b68] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] shadow-2xl rounded-2xl max-w-[calc(100vw-2rem)]">
           {(onClose) => (
             <>
               <ModalHeader className="text-xl font-bold text-[#0C2856] dark:text-white tracking-wide border-b border-[#e6edf7] dark:border-[#1d3b68] pb-4">

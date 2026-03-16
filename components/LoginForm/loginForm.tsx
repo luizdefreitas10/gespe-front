@@ -64,7 +64,7 @@ export default function LoginForm() {
 
   return (
     <Form
-      className=" dark:bg-black/30 w-[600px] p-10 px-35 rounded-2xl backdrop-blur-md border-2 border-[#8b97ab] dark:border-[#293c61]"
+      className="dark:bg-black/30 w-full max-w-[600px] md:w-[600px] mx-auto p-6 px-5 sm:p-8 sm:px-8 md:p-10 md:px-35 rounded-2xl backdrop-blur-md border-2 border-[#8b97ab] dark:border-[#293c61]"
       onSubmit={handleSubmit(submitLogin)}
     >
       <Image
@@ -76,27 +76,35 @@ export default function LoginForm() {
         className="mx-auto"
       />
       <h1 className="mx-auto mt-6">Login</h1>
-      <div className="w-full space-y-2">
+      <div className="w-full min-w-0 space-y-2">
         <Input
           variant="underlined"
           type="email"
           placeholder="Digite seu email"
           label="Email"
-          // className="border-b-1"
+          className="w-full min-w-0"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
           {...register("email")}
           isInvalid={!!errors.email}
           errorMessage={errors.email?.message}
-        ></Input>
+        />
         <Input
           variant="underlined"
           type="password"
           placeholder="Digite sua senha"
           label="Senha"
-          // className="border-b-1"
+          className="w-full min-w-0"
+          classNames={{
+            inputWrapper: "min-h-12 sm:min-h-10",
+            input: "text-base min-w-0 w-full",
+          }}
           {...register("password")}
           isInvalid={!!errors.password}
           errorMessage={errors.password?.message}
-        ></Input>
+        />
       </div>
 
       <Button

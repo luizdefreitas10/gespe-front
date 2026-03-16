@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.24",
@@ -68,6 +72,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "15.3.4",
+    "@playwright/test": "^1.58.2",
     "@react-types/shared": "3.32.1",
     "@tailwindcss/postcss": "4.1.11",
     "@types/jsonwebtoken": "^9.0.10",
