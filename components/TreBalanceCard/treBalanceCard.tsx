@@ -12,7 +12,7 @@ interface TreBalanceCardProps {
   years: string[];
   loading: boolean;
   balanceData: ITreBalanceResponse | null;
-  onYearChange: (year: string) => void;
+  onYearChange: (year: string | null) => void;
 }
 
 export default function TreBalanceCard({
@@ -22,7 +22,7 @@ export default function TreBalanceCard({
   balanceData,
   onYearChange,
 }: TreBalanceCardProps) {
-  const hasSelectedYear = Boolean(selectedYear);
+  const hasSelectedYear = Boolean(selectedYear && selectedYear !== "all");
 
   const totalDays = balanceData?.total || 0;
   const usedDays = balanceData?.used || 0;
@@ -41,8 +41,8 @@ export default function TreBalanceCard({
   }, [balanceData?.year, hasSelectedYear, selectedYear]);
 
   const handleYearChange = (keys: any) => {
-    const selected = Array.from(keys)[0] as string;
-    onYearChange(selected);
+    const selected = Array.from(keys)[0] as string | undefined;
+    onYearChange(selected === "all" || !selected ? null : selected);
   };
 
   return (
@@ -82,12 +82,12 @@ export default function TreBalanceCard({
             <Select
               label="Selecione o ano"
               className="w-max-w-xs"
-              selectedKeys={selectedYear ? [selectedYear] : []}
+              selectedKeys={selectedYear ? [selectedYear] : ["all"]}
               onSelectionChange={handleYearChange}
             >
-              {years.map((year) => (
-                <SelectItem key={year}>
-                  {year}
+              {["all", ...years].map((yearOption) => (
+                <SelectItem key={yearOption}>
+                  {yearOption === "all" ? "Todos os anos" : yearOption}
                 </SelectItem>
               ))}
             </Select>

@@ -12,7 +12,8 @@ export default function ProgramedVacationDaysCard({
   totalDays = 0,
   year,
 }: ProgramedVacationDaysCardProps) {
-  const yearLabel = year ? `para ${year}` : "para todos os anos";
+  const isAllYears = year === null || year === undefined || year === "all";
+  const yearLabel = isAllYears ? "para todos os anos" : `para ${year}`;
   const daysLabel = totalDays === 1 ? "dia" : "dias";
 
   return (

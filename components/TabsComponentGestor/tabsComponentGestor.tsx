@@ -11,6 +11,7 @@ import VacationHistory from "../VacationHistory/vacationHistory";
 import TreBalanceCard from "../TreBalanceCard/treBalanceCard";
 import ProgramedTreDaysCard from "../ProgramedTreDaysCard/programedTreDaysCard";
 import TreHistory from "../TreHistory/treHistory";
+import DashboardInsights from "../DashboardInsights/dashboardInsights";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function TabsComponentGestor() {
@@ -22,7 +23,7 @@ export default function TabsComponentGestor() {
   const currentYear = useMemo(() => new Date().getFullYear(), []);
   
   // Estados para Férias
-  const [selectedYear, setSelectedYear] = useState<string>(
+  const [selectedYear, setSelectedYear] = useState<string | null>(
     currentYear.toString()
   );
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,7 +62,7 @@ export default function TabsComponentGestor() {
       try {
         setLoading(true);
         const params = new URLSearchParams();
-        if (year) {
+        if (year && year !== "all") {
           params.append("year", year);
         }
 
@@ -157,6 +158,7 @@ export default function TabsComponentGestor() {
                 onYearChange={setSelectedYear}
               />
               <VacationHistory />
+              <DashboardInsights type="vacation" selectedYear={selectedYear} />
             </>
           )}
         </Tab>
@@ -179,6 +181,7 @@ export default function TabsComponentGestor() {
                 onYearChange={setSelectedTreYear}
               />
               <TreHistory />
+              <DashboardInsights type="tre" selectedYear={selectedTreYear} />
             </>
           )}
         </Tab>

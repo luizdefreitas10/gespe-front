@@ -7,11 +7,11 @@ import { Spinner } from "@heroui/spinner";
 import { CalendarIcon } from "../CalendarIcon/calendarIcon";
 
 interface BalanceCardProps {
-  selectedYear: string;
+  selectedYear: string | null;
   years: string[];
   loading: boolean;
   balanceData: IVacationBalanceResponse | null;
-  onYearChange: (year: string) => void;
+  onYearChange: (year: string | null) => void;
 }
 
 export default function BalanceCard({
@@ -29,8 +29,8 @@ export default function BalanceCard({
   const hasYearFilter = balanceData?.year !== null && balanceData?.year !== undefined;
 
   const handleYearChange = (keys: any) => {
-    const selected = Array.from(keys)[0] as string;
-    onYearChange(selected);
+    const selected = Array.from(keys)[0] as string | undefined;
+    onYearChange(selected === "all" || !selected ? null : selected);
   };
 
   const gradientStyleBottomLeft = {
@@ -74,11 +74,13 @@ export default function BalanceCard({
             <Select
               label="Selecione o ano"
               className="w-max-w-xs"
-              selectedKeys={[selectedYear]}
+              selectedKeys={selectedYear ? [selectedYear] : ["all"]}
               onSelectionChange={handleYearChange}
             >
-              {years.map((year) => (
-                <SelectItem key={year}>{year}</SelectItem>
+              {["all", ...years].map((yearOption) => (
+                <SelectItem key={yearOption}>
+                  {yearOption === "all" ? "Todos os anos" : yearOption}
+                </SelectItem>
               ))}
             </Select>
           </div>
