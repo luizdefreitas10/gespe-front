@@ -135,14 +135,22 @@ export default function UserDetailsEditor({ userId }: UserDetailsEditorProps) {
   }
 
   return (
-    <section className="w-full rounded-[28px] border border-[#0C2856] bg-[#f0f4f8] px-6 py-6 shadow-sm dark:border-[#2b5e9a] dark:bg-gradient-to-b dark:from-[#0b1c38] dark:via-[#08214a] dark:to-[#07142e] dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-      <div className="mb-5 flex items-center justify-start">
+    <section className="relative overflow-hidden w-full rounded-[28px] border border-[#0C2856] bg-white px-6 py-6 shadow-sm dark:border-[#2b5e9a] dark:bg-gradient-to-b dark:from-[#0b1c38] dark:via-[#08214a] dark:to-[#07142e] dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+      <div
+        className="pointer-events-none absolute inset-0 dark:hidden"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(26,95,180,0.18) 50%, rgba(255,255,255,0.3) 100%)",
+        }}
+        aria-hidden
+      />
+      <div className="relative mb-5 flex items-center justify-start">
         <h2 className="text-lg font-bold text-[#0C2856] dark:text-white">
           Gestão de usuário
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className="relative grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
           label="Nome completo"
           value={formData.fullName}
