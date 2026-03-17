@@ -25,7 +25,6 @@ export default function BalanceCard({
   const usedDays = balanceData?.used || 0;
   const totalDays = balanceData?.total || 0;
   const yearRecordsCount = balanceData?.recordsCount || 0;
-  const overallAvailableDays = balanceData?.overallBalance?.available || 0;
   const progressPercentage = totalDays > 0 ? (usedDays / totalDays) * 100 : 0;
   const hasYearFilter = balanceData?.year !== null && balanceData?.year !== undefined;
 
@@ -34,10 +33,30 @@ export default function BalanceCard({
     onYearChange(selected);
   };
 
+  const gradientStyleBottomLeft = {
+    background: "linear-gradient(to bottom left, rgba(26,95,180,1) 0%, transparent 30%)",
+  };
+  const gradientStyleTopRight = {
+    background: "linear-gradient(to top right, rgba(26,95,180,1) 0%, transparent 30%)",
+  };
+
+  const cardClass =
+    "w-full mx-auto overflow-hidden bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border dark:border-[#102d59] dark:shadow-xl";
+
   return (
-    <Card className="w-full mx-auto bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border dark:border-[#102d59] dark:shadow-[0_12px_45px_rgba(0,0,0,0.5)]">
-      <CardBody className="w-full h-full bg-transparent dark:bg-transparent">
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+    <Card className={cardClass}>
+      <CardBody className="relative w-full h-full bg-transparent dark:bg-transparent">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-25 dark:hidden"
+          style={gradientStyleBottomLeft}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-25 dark:hidden"
+          style={gradientStyleTopRight}
+          aria-hidden
+        />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex gap-4 items-center text-[#6a7bd2]">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#e8f0ff] text-[#6a7bd2] dark:bg-[#1e293b] dark:text-[#a5b4fc]">
               <CalendarIcon width={24} height={24} />
@@ -84,9 +103,6 @@ export default function BalanceCard({
                   ? `Disponíveis para ${balanceData.year}`
                   : "Disponíveis (todos os anos)"}
               </p>
-              <p className="text-xs text-gray-500 mt-1 dark:text-[#a3a3a3]">
-                Saldo total disponivel (todos os anos): {overallAvailableDays} dias
-              </p>
             </div>
             <Progress
               aria-label="Progresso de férias"
@@ -119,11 +135,6 @@ export default function BalanceCard({
                 {hasYearFilter
                   ? `Registros no ano: ${yearRecordsCount}`
                   : `Registros no periodo: ${yearRecordsCount}`}
-              </span>
-              <span>
-                {hasYearFilter
-                  ? `Saldo do ano: ${totalDays} dias`
-                  : `Saldo do periodo: ${totalDays} dias`}
               </span>
             </div>
           </>

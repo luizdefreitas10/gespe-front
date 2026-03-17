@@ -131,7 +131,16 @@ export default function TreHistory() {
 
   return (
     <div className="w-full mt-8 mb-10">
-      <div className="rounded-3xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] dark:shadow-[0_12px_45px_rgba(0,0,0,0.5)] px-4 py-6 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] dark:shadow-[0_12px_45px_rgba(0,0,0,0.5)] px-4 py-6 shadow-sm">
+        <div
+          className="pointer-events-none absolute inset-0 dark:hidden"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(26,95,180,0.18) 50%, rgba(255,255,255,0.3) 100%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative">
         <h2 className="text-lg font-bold text-[#0C2856] dark:text-white mb-4">Histórico de TRE</h2>
 
         {loading ? (
@@ -201,6 +210,7 @@ export default function TreHistory() {
           ) : (
             <h1 className="text-[#0C2856] dark:text-white text-[14px] font-semibold">Não há mais registros</h1>
           )}
+        </div>
         </div>
       </div>
 

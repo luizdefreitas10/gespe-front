@@ -131,7 +131,16 @@ export default function VacationHistory() {
 
   return (
     <div className="w-full mt-8 mb-10">
-      <div className="rounded-3xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] dark:shadow-[0_12px_45px_rgba(0,0,0,0.5)] px-4 py-6 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] dark:shadow-[0_12px_45px_rgba(0,0,0,0.5)] px-4 py-6 shadow-sm">
+        <div
+          className="pointer-events-none absolute inset-0 dark:hidden"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(26,95,180,0.18) 50%, rgba(255,255,255,0.3) 100%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative">
         <h2 className="text-lg font-bold text-[#0C2856] dark:text-white mb-4">Histórico de férias</h2>
 
         {loading ? (
@@ -147,7 +156,7 @@ export default function VacationHistory() {
               return (
               <div
                 key={key}
-                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 rounded-2xl border border-[#0C2856] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] px-4 py-3 shadow-sm cursor-pointer transition hover:shadow-md"
+                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 rounded-2xl border border-[#3A3A3A] bg-white dark:bg-gradient-to-b dark:from-[#0b1626] dark:via-[#0b1b33] dark:to-[#0c2546] dark:border-[#102d59] px-4 py-4 shadow-sm cursor-pointer transition hover:shadow-md"
                 onClick={() => setSelectedVacation(vacation)}
                 role="button"
                 tabIndex={0}
@@ -160,7 +169,7 @@ export default function VacationHistory() {
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-[#0C2856] dark:text-white">
-                    Férias liberadas
+                    {getVacationRequestTypeLabel(vacation.requestType)}
                   </span>
                   <span className="text-xs text-gray-600 dark:text-gray-300">
                     {formatDate(vacation.firstVacationDay)} - {formatDate(vacation.lastVacationDay)}
@@ -192,6 +201,7 @@ export default function VacationHistory() {
           ) : (
             <h1 className="text-[#0C2856] dark:text-white text-[14px] font-semibold">Não há mais registros</h1>
           )}
+        </div>
         </div>
       </div>
 

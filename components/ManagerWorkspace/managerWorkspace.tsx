@@ -555,8 +555,16 @@ export default function ManagerWorkspace({ variant }: ManagerWorkspaceProps) {
 
   const renderRecordsPanel = () => {
     return (
-      <section className="w-full rounded-[28px] border border-[#0C2856] bg-[#f0f4f8] px-6 py-5 shadow-sm dark:border-[#2b5e9a] dark:bg-gradient-to-b dark:from-[#0b1c38] dark:via-[#08214a] dark:to-[#07142e] dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-        <div className="flex flex-col gap-4">
+      <section className="relative overflow-hidden w-full rounded-[28px] border border-[#0C2856] bg-white px-6 py-5 shadow-sm dark:border-[#2b5e9a] dark:bg-gradient-to-b dark:from-[#0b1c38] dark:via-[#08214a] dark:to-[#07142e] dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+        <div
+          className="pointer-events-none absolute inset-0 dark:hidden"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(26,95,180,0.18) 50%, rgba(255,255,255,0.3) 100%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="w-full md:max-w-[420px]">
               <label className="mb-2 block text-[12px] font-semibold text-[#1e1e1e] dark:text-[#d8e8ff]">
