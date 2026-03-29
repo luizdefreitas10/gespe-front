@@ -19,11 +19,24 @@ import {
   YAxis,
 } from "recharts";
 
+import { buildTreOverviewFromUser, buildVacationOverviewFromUser } from "./buildOverviewFromUser";
+
 type DashboardType = "vacation" | "tre";
+
+export interface DashboardEmbeddedYearFilter {
+  years: string[];
+  value: string | null;
+  onChange: (value: string | null) => void;
+}
 
 interface DashboardInsightsProps {
   type: DashboardType;
   selectedYear?: string | null;
+  /** Visualização geral: dashboard reflete o usuário selecionado (via `sourceUser`). */
+  forUserId?: string | null;
+  sourceUser?: IUser | null;
+  /** Exibe o filtro de ano no topo direito do card (ex.: overview). */
+  embeddedYearFilter?: DashboardEmbeddedYearFilter;
 }
 
 type MonthlyPoint = {
@@ -84,13 +97,40 @@ function getLast12MonthsPoints(dates: Array<string | null | undefined>): Monthly
   });
 }
 
-export default function DashboardInsights({ type, selectedYear }: DashboardInsightsProps) {
+export default function DashboardInsights({
+  type,
+  selectedYear,
+  forUserId,
+  sourceUser,
+  embeddedYearFilter,
+}: DashboardInsightsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [vacationData, setVacationData] = useState<IVacationOverviewResponse | null>(null);
   const [treData, setTreData] = useState<ITreOverviewResponse | null>(null);
 
+  const useOverviewFromSelectedUser = Boolean(
+    forUserId && sourceUser && sourceUser.id === forUserId
+  );
+
+  const waitingForSelectedUser =
+    Boolean(forUserId) && (!sourceUser || sourceUser.id !== forUserId);
+
+  const derivedVacationOverview = useMemo(() => {
+    if (!useOverviewFromSelectedUser || type !== "vacation" || !sourceUser) return null;
+    return buildVacationOverviewFromUser(sourceUser);
+  }, [useOverviewFromSelectedUser, type, sourceUser]);
+
+  const derivedTreOverview = useMemo(() => {
+    if (!useOverviewFromSelectedUser || type !== "tre" || !sourceUser) return null;
+    return buildTreOverviewFromUser(sourceUser);
+  }, [useOverviewFromSelectedUser, type, sourceUser]);
+
   useEffect(() => {
+    if (forUserId) {
+      return;
+    }
+
     const fetchOverview = async () => {
       try {
         setLoading(true);
@@ -116,9 +156,27 @@ export default function DashboardInsights({ type, selectedYear }: DashboardInsig
     };
 
     fetchOverview();
-  }, [type, selectedYear]);
+  }, [type, selectedYear, forUserId]);
 
-  const payload = type === "vacation" ? vacationData : treData;
+  const vacationPayload = useMemo(() => {
+    if (forUserId) {
+      if (waitingForSelectedUser) return null;
+      return derivedVacationOverview;
+    }
+    return vacationData;
+  }, [forUserId, waitingForSelectedUser, derivedVacationOverview, vacationData]);
+
+  const trePayload = useMemo(() => {
+    if (forUserId) {
+      if (waitingForSelectedUser) return null;
+      return derivedTreOverview;
+    }
+    return treData;
+  }, [forUserId, waitingForSelectedUser, derivedTreOverview, treData]);
+
+  const payload = type === "vacation" ? vacationPayload : trePayload;
+
+  const showLoadingBlock = waitingForSelectedUser || (!forUserId && loading);
 
   const selectedYearNumber = useMemo(() => {
     if (!selectedYear || selectedYear === "all") return null;
@@ -127,16 +185,16 @@ export default function DashboardInsights({ type, selectedYear }: DashboardInsig
   }, [selectedYear]);
 
   const filteredVacationRecords = useMemo(() => {
-    const records = vacationData?.vacations ?? [];
+    const records = vacationPayload?.vacations ?? [];
     if (!selectedYearNumber) return records;
     return records.filter((record) => record.year === selectedYearNumber);
-  }, [vacationData?.vacations, selectedYearNumber]);
+  }, [vacationPayload?.vacations, selectedYearNumber]);
 
   const filteredTreRecords = useMemo(() => {
-    const records = treData?.tres ?? [];
+    const records = trePayload?.tres ?? [];
     if (!selectedYearNumber) return records;
     return records.filter((record) => record.yearOfAcquisition === selectedYearNumber);
-  }, [treData?.tres, selectedYearNumber]);
+  }, [trePayload?.tres, selectedYearNumber]);
 
   const records = type === "vacation" ? filteredVacationRecords : filteredTreRecords;
 
@@ -202,11 +260,45 @@ export default function DashboardInsights({ type, selectedYear }: DashboardInsig
       />
 
       <div className="relative">
-        <h2 className="text-lg font-bold text-[#0C2856] dark:text-white mb-5">
-          Dashboard de {type === "vacation" ? "férias" : "TRE"}
-        </h2>
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <h2 className="text-lg font-bold text-[#0C2856] dark:text-white shrink-0 self-start">
+            Dashboard de {type === "vacation" ? "férias" : "TRE"}
+          </h2>
+          {embeddedYearFilter ? (
+            <div className="flex w-full flex-col items-stretch gap-1 sm:w-auto sm:min-w-[200px] sm:items-end">
+              <label
+                htmlFor={`dashboard-year-${type}`}
+                className="text-[12px] font-semibold text-[#37445b] dark:text-[#bfd5f6] sm:text-right"
+              >
+                Ano de referência
+              </label>
+              <select
+                id={`dashboard-year-${type}`}
+                value={
+                  embeddedYearFilter.value === null ||
+                  embeddedYearFilter.value === undefined ||
+                  embeddedYearFilter.value === "all"
+                    ? "all"
+                    : embeddedYearFilter.value
+                }
+                onChange={(event) => {
+                  const v = event.target.value;
+                  embeddedYearFilter.onChange(v === "all" ? null : v);
+                }}
+                className="h-10 w-full rounded-lg border border-[#d4d9e0] bg-[#e3e8ef] px-3 text-sm text-[#1e1e1e] outline-none dark:border-[#3f6087] dark:bg-[rgba(255,255,255,0.16)] dark:text-[#d8e8ff] sm:max-w-[220px]"
+              >
+                <option value="all">Todos os anos</option>
+                {embeddedYearFilter.years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+        </div>
 
-        {loading ? (
+        {showLoadingBlock ? (
           <div className="flex justify-center py-12">
             <Spinner />
           </div>

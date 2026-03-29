@@ -51,7 +51,7 @@ export default function GestorPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-amber-300 flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <Spinner />
       </div>
     );
