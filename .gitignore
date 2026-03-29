@@ -44,3 +44,7 @@ package-lock.json
 bun.lockb
 
 .cursor/
+
+# PWA — gerados no `next build` por @ducanh2912/next-pwa (hash do workbox muda)
+public/sw.js
+public/workbox-*.js
