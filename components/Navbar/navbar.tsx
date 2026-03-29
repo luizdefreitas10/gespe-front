@@ -13,6 +13,7 @@ import {
 } from "@heroui/drawer";
 
 import { ThemeSwitch } from "@/components/theme-switch";
+import { PwaInstallButton } from "@/components/PwaInstallButton/pwaInstallButton";
 import Image from "next/image";
 import arpeLogo from "../../public/arpe-light-logo.svg";
 import arpeColoredLogo from "../../public/arpe-colored-logo.png";
@@ -83,7 +84,8 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden sm:flex gap-4">
+        <NavbarItem className="hidden sm:flex gap-4 items-center">
+          <PwaInstallButton />
           <ThemeSwitch />
           {isAuthenticated && loggedUser ? (
             <>
@@ -115,7 +117,8 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+      <NavbarContent className="sm:hidden basis-1 pl-4 gap-2 flex-wrap justify-end" justify="end">
+        <PwaInstallButton />
         <ThemeSwitch />
         {isAuthenticated && loggedUser && (
           <Button onPress={handleSignOut}>SAIR</Button>
