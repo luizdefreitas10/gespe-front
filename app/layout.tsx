@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontInter } from "@/config/fonts";
 import { Navbar } from "@/components/Navbar/navbar";
+import { Footer } from "@/components/Footer/footer";
 import BackgroundImage from "@/components/BackgroundImage/backgroundImage";
 import ToastProvider from "@/components/ToastContainer";
 
@@ -50,6 +51,7 @@ export default function RootLayout({
               {children}
               <ToastProvider />
             </main>
+            <Footer />
           </div>
         </Providers>
       </body>

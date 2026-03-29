@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import UserManagement from "../UserManagement/userManagement";
+import DashboardInsights from "../DashboardInsights/dashboardInsights";
 
 type WorkspaceVariant = "overview" | "management";
 type RecordType = "vacation" | "tre";
@@ -140,6 +141,18 @@ export default function ManagerWorkspace({ variant }: ManagerWorkspaceProps) {
     treSeiNumber: "",
     observations: "",
   });
+
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+  const overviewYears = useMemo(
+    () => Array.from({ length: 9 }, (_, i) => currentYear - i).map(String),
+    [currentYear]
+  );
+  const [overviewVacationYear, setOverviewVacationYear] = useState<string | null>(() =>
+    String(new Date().getFullYear())
+  );
+  const [overviewTreYear, setOverviewTreYear] = useState<string | null>(() =>
+    String(new Date().getFullYear())
+  );
 
   const currentRecordType: RecordType = activeWorkspaceTab === "tre" ? "tre" : "vacation";
 
@@ -682,6 +695,26 @@ export default function ManagerWorkspace({ variant }: ManagerWorkspaceProps) {
     );
   };
 
+  const renderOverviewDashboard = (dashboardKind: "vacation" | "tre") => {
+    const year = dashboardKind === "vacation" ? overviewVacationYear : overviewTreYear;
+    const setYear = dashboardKind === "vacation" ? setOverviewVacationYear : setOverviewTreYear;
+    return (
+      <div className="mt-8 w-full">
+        <DashboardInsights
+          type={dashboardKind}
+          selectedYear={year}
+          forUserId={selectedUserId}
+          sourceUser={selectedUserDetails}
+          embeddedYearFilter={{
+            years: overviewYears,
+            value: year,
+            onChange: setYear,
+          }}
+        />
+      </div>
+    );
+  };
+
   if (variant === "management") {
     return (
       <>
@@ -752,11 +785,21 @@ export default function ManagerWorkspace({ variant }: ManagerWorkspaceProps) {
           tabList: "bg-[#0C2856] dark:bg-[#0C2856] items-center justify-center rounded-full",
         }}
       >
-        <Tab key="ferias" title="Férias" className="w-full">
+        <Tab
+          key="ferias"
+          title="Férias"
+          className="flex-col items-center justify-center w-full md:w-[80%] md:mx-auto"
+        >
           {renderRecordsPanel()}
+          {renderOverviewDashboard("vacation")}
         </Tab>
-        <Tab key="tre" title="TRE" className="w-full">
+        <Tab
+          key="tre"
+          title="TRE"
+          className="flex-col items-center justify-center w-full md:w-[80%] md:mx-auto"
+        >
           {renderRecordsPanel()}
+          {renderOverviewDashboard("tre")}
         </Tab>
       </Tabs>
 
